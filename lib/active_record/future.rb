@@ -1,6 +1,7 @@
 module ActiveRecord
   class Future
     include Delegation
+    delegate :to_sql, to: :relation
 
     class << self
       # This should be set in a thread scope
@@ -48,10 +49,6 @@ module ActiveRecord
       Future.current = self
       relation.to_a
       Future.current = nil
-    end
-
-    def to_sql
-      @relation.to_sql
     end
 
     def to_a

@@ -8,14 +8,16 @@ Gem::Specification.new do |gem|
   gem.version       = Activerecord::Futures::VERSION
   gem.authors       = ["Leonardo Andres Garcia Crespo"]
   gem.email         = ["leoasis@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{Save unnecessary round trips to the database}
+  gem.summary       = %q{Fetch all queries at once from the database and save round trips. }
+  gem.homepage      = "https://github.com/leoasis/activerecord-futures"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'activerecord'
+  gem.add_dependency 'activerecord', '>= 3.2.13'
+  gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'rspec-spies'
 end
