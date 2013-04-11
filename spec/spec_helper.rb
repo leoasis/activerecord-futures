@@ -28,6 +28,6 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.after do
-    ActiveRecord::Future.clear
+    ActiveRecord::Futures::Future.clear
   end
 end

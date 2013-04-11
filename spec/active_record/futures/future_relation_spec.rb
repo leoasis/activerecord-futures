@@ -1,9 +1,9 @@
 require "spec_helper"
 
-module ActiveRecord
-  describe Future do
-    let(:relation) { double(Relation, klass: Class.new, to_a: nil) }
-    subject { Future.new(relation) }
+module ActiveRecord::Futures
+  describe FutureRelation do
+    let(:relation) { double(ActiveRecord::Relation, klass: Class.new, to_a: nil) }
+    subject { FutureRelation.new(relation) }
 
     describe ".new" do
       before do
@@ -44,11 +44,11 @@ module ActiveRecord
         relation.should have_received(:to_a)
       end
 
-      it "set the current future to itself while #to_a was being called in the relation" do
+      it "sets the current future to itself while #to_a was being called in the relation" do
         @current_future.should == subject
       end
 
-      it "set to nil the current future afterwards" do
+      it "sets to nil the current future afterwards" do
         Future.current.should == nil
       end
     end

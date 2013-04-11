@@ -24,7 +24,7 @@ module ActiveRecord
       end
 
       def exec_query(sql, name = 'SQL', binds = [])
-        my_future = Future.current
+        my_future = Futures::Future.current
 
         # default behavior if not a current future
         return super unless my_future
@@ -32,7 +32,7 @@ module ActiveRecord
         # return fulfilled result, if exists, to load the relation
         return my_future.result if my_future.fulfilled?
 
-        futures = Future.all
+        futures = Futures::Future.all
 
         futures_sql = futures.map(&:to_sql).join(';')
         name = "#{name} (fetching Futures)"

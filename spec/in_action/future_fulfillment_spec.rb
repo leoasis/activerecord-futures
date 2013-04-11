@@ -1,6 +1,6 @@
 require "spec_helper"
 
-module ActiveRecord
+module ActiveRecord::Futures
   describe "Future fulfillment" do
     subject { Future }
 
