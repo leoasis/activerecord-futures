@@ -2,13 +2,17 @@ module ActiveRecord
   module Futures
     class Future
       class << self
-        # This should be set in a thread scope
-        attr_accessor :current
+        def futures
+          Thread.current["#{self.name}_futures"] ||= []
+        end
+        alias_method :all, :futures
 
-        def all
-          # Make this live together with the connection
-          # or thread based
-          @futures ||= []
+        def current
+          Thread.current["#{self.name}_current"]
+        end
+
+        def current=(future)
+          Thread.current["#{self.name}_current"] = future
         end
 
         def clear
@@ -16,12 +20,11 @@ module ActiveRecord
         end
 
         def register(future)
-          @futures ||= []
-          @futures << future
+          self.futures << future
         end
 
         def flush
-          all.each(&:load)
+          self.futures.each(&:load)
           clear
         end
       end
