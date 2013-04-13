@@ -27,6 +27,15 @@ module ActiveRecord
           self.futures.each(&:load)
           clear
         end
+
+      private
+        def fetch_with(method, &block)
+          define_method(method) do
+            # Flush all the futures upon first attempt to exec a future
+            Future.flush unless executed?
+            instance_eval(&block)
+          end
+        end
       end
 
 

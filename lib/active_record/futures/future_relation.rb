@@ -13,11 +13,7 @@ module ActiveRecord
         @klass = relation.klass
       end
 
-      def to_a
-        # Flush all the futures upon first attempt to exec a future
-        Future.flush unless executed?
-        execute
-      end
+      fetch_with(:to_a) { execute }
 
     private
 

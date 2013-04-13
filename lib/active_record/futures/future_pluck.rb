@@ -1,6 +1,8 @@
 module ActiveRecord
   module Futures
-    class FutureCalculation < Future
+    class FuturePluck < Future
+      include Delegation
+
       attr_reader :query, :execution
       private :query, :execution
 
@@ -10,11 +12,7 @@ module ActiveRecord
         @execution = execution
       end
 
-      fetch_with(:value) { @value }
-
-      def inspect
-        value.inspect
-      end
+      fetch_with(:to_a) { @value }
 
       def to_sql
         query

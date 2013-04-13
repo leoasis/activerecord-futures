@@ -3,7 +3,7 @@ module ActiveRecord
     include QueryRecording
 
     def self.original_calculation_methods
-      ActiveRecord::Calculations.public_instance_methods
+      [:count, :average, :minimum, :maximum, :sum, :calculate]
     end
 
     def self.future_calculation_methods
@@ -17,6 +17,12 @@ module ActiveRecord
       # simply pass through if the connection adapter does not support
       # futures
       supports_futures ? FutureRelation.new(self) : self
+    end
+
+    def future_pluck(column_name)
+      exec = lambda { pluck(column_name) }
+      query = record_query(&exec)
+      FuturePluck.new(query, exec)
     end
 
     method_table = Hash[future_calculation_methods.zip(original_calculation_methods)]

@@ -11,8 +11,9 @@ config = {
 
 ActiveRecord::Base.establish_connection(config)
 require 'db/schema'
+Dir['./spec/models/**/*.rb'].each { |f| require f }
 
-Dir[File.join(File.dirname(__FILE__), 'models/**/*')].each { |f| require f }
+Dir["./spec/support/**/*.rb"].sort.each {|f| require f}
 
 require 'rspec-spies'
 

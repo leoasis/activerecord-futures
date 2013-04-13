@@ -4,6 +4,7 @@ require "activerecord-futures/version"
 
 require "active_record/futures/future"
 require "active_record/futures/future_relation"
+require "active_record/futures/future_pluck"
 require "active_record/futures/future_calculation"
 
 require "active_record/futures/query_recording"
