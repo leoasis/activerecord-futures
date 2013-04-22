@@ -5,7 +5,7 @@ module ActiveRecord::Futures
     subject { Future }
 
     context "when futurizing a relation" do
-      let!(:future) { User.where(name: "").future }
+      let!(:future) { Post.where(title: "Some post").future }
 
       its(:all) { should have(1).future }
 
@@ -27,8 +27,8 @@ module ActiveRecord::Futures
     end
 
     context "when futurizing two relations" do
-      let!(:future) { User.where(name: "").future }
-      let!(:another_future) { Country.where(name: "").future }
+      let!(:future) { Post.where(title: "Some post").future }
+      let!(:another_future) { User.where(name: "Lenny").future }
 
       its(:all) { should have(2).futures }
 
@@ -55,7 +55,7 @@ module ActiveRecord::Futures
       end
 
       context "and executing another non futurized relation" do
-        let!(:normal_relation) { User.where(name: "") }
+        let!(:normal_relation) { User.where(name: "John") }
         before { normal_relation.to_a }
 
         its(:all) { should have(2).futures }

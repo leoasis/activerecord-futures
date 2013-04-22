@@ -10,6 +10,11 @@ RSpec::Matchers.define :exec do |expected|
   chain :query do
   end
 
+  description do
+    queries = expected == 1 ? "query" : "queries"
+    "exec #{expected} #{queries}"
+  end
+
   failure_message_for_should do |actual|
     "Expected to execute #{expected} queries, executed #{@query_counter.query_count}: #{@query_counter.queries}"
   end
@@ -23,39 +28,38 @@ RSpec::Matchers.define :exec do |expected|
     ActiveSupport::Notifications.subscribed(@query_counter.method(:call), 'sql.active_record', &block)
     @query_counter.query_count
   end
+end
 
-  class QueryCounter
-    attr_accessor :query_count
-    attr_accessor :queries
+class QueryCounter
+  attr_accessor :query_count
+  attr_accessor :queries
 
-    IGNORED_SQL = [
-      /^PRAGMA (?!(table_info))/,
-      /^SELECT currval/,
-      /^SELECT CAST/,
-      /^SELECT @@IDENTITY/,
-      /^SELECT @@ROWCOUNT/,
-      /^SAVEPOINT/,
-      /^ROLLBACK TO SAVEPOINT/,
-      /^RELEASE SAVEPOINT/,
-      /^SHOW max_identifier_length/,
-      /SHOW/
-    ]
+  IGNORED_SQL = [
+    /^PRAGMA (?!(table_info))/,
+    /^SELECT currval/,
+    /^SELECT CAST/,
+    /^SELECT @@IDENTITY/,
+    /^SELECT @@ROWCOUNT/,
+    /^SAVEPOINT/,
+    /^ROLLBACK TO SAVEPOINT/,
+    /^RELEASE SAVEPOINT/,
+    /^SHOW max_identifier_length/,
+    /SHOW/
+  ]
 
-    def initialize
-      self.query_count = 0
-      self.queries = []
-    end
+  def initialize
+    self.query_count = 0
+    self.queries = []
+  end
 
-    def call(name, start, finish, message_id, values)
-      # FIXME: this seems bad. we should probably have a better way to indicate
-      # the query was cached
-      unless 'CACHE' == values[:name]
-        unless IGNORED_SQL.any? { |r| values[:sql] =~ r }
-          self.query_count += 1
-          self.queries << values[:sql]
-        end
+  def call(name, start, finish, message_id, values)
+    # FIXME: this seems bad. we should probably have a better way to indicate
+    # the query was cached
+    unless 'CACHE' == values[:name]
+      unless IGNORED_SQL.any? { |r| values[:sql] =~ r }
+        self.query_count += 1
+        self.queries << values[:sql]
       end
     end
   end
-
 end

@@ -13,32 +13,28 @@ module ActiveRecord
         @klass = orig_klass
       end
 
-      class KlassProxy
+      class KlassProxy < Proxy
         attr_reader :klass, :connection
 
         def initialize(klass, connection)
+          super(klass)
           @klass = klass
           @connection = connection
         end
 
-        def method_missing(method, *args, &block)
-          if klass.respond_to?(method)
-            klass.send(method, *args, &block)
-          else
-            super
-          end
-        end
-
-        def respond_to?(method, include_all = false)
-          super || klass.respond_to?(method, include_all)
+        def build_default_scope
+          scope = @klass.send(:build_default_scope)
+          scope.instance_variable_set(:@klass, self)
+          scope
         end
       end
 
-      class ConnectionProxy
+      class ConnectionProxy < Proxy
         attr_reader :connection
         attr_accessor :recorded_query
 
         def initialize(connection)
+          super(connection)
           @connection = connection
         end
 
@@ -50,18 +46,6 @@ module ActiveRecord
         def select_all(arel, name = nil, binds = [])
           self.recorded_query = arel.to_sql
           []
-        end
-
-        def method_missing(method, *args, &block)
-          if connection.respond_to?(method)
-            connection.send(method, *args, &block)
-          else
-            super
-          end
-        end
-
-        def respond_to?(method, include_all = false)
-          super || connection.respond_to?(method, include_all)
         end
       end
     end

@@ -7,6 +7,7 @@ require "active_record/futures/future_relation"
 require "active_record/futures/future_pluck"
 require "active_record/futures/future_calculation"
 
+require "active_record/futures/proxy"
 require "active_record/futures/query_recording"
 require "active_record/futures"
 require "active_record/futures/delegation"
