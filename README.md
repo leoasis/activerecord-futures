@@ -1,5 +1,7 @@
 # ActiveRecord::Futures
 
+[![Code Climate](https://codeclimate.com/github/leoasis/activerecord-futures.png)](https://codeclimate.com/github/leoasis/activerecord-futures)
+
 Define future queries in ActiveRecord that will get executed in a single round trip to the database.
 
 ## Installation
