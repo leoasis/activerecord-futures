@@ -44,6 +44,7 @@ class QueryCounter
     /^ROLLBACK TO SAVEPOINT/,
     /^RELEASE SAVEPOINT/,
     /^SHOW max_identifier_length/,
+    /SELECT attr.attname\n          FROM pg_attribute attr/,
     /SHOW/
   ]
 

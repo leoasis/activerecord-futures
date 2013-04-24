@@ -2,7 +2,6 @@ module ActiveRecord
   module Futures
     class FutureRelation < Future
       include Delegation
-      delegate :to_sql, to: :relation
 
       attr_reader :relation
       private :relation
@@ -11,9 +10,19 @@ module ActiveRecord
         super()
         @relation = relation
         @klass = relation.klass
+
+        # Eagerly get sql from relation, since PostgreSQL adapter may use the
+        # same method `exec_query` to retrieve the columns when executing
+        # `to_sql`, and that will cause an infinite loop if a current future
+        # exists
+        @query = relation.to_sql
       end
 
       fetch_with(:to_a) { execute }
+
+      def to_sql
+        @query
+      end
 
     private
 

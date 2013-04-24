@@ -1,6 +1,6 @@
 require 'activerecord-futures'
 
-config = {
+mysql_config = {
   adapter: "future_enabled_mysql2",
   database: "test",
   username: "root",
@@ -8,6 +8,22 @@ config = {
   database: "activerecord_futures_test",
   host: "localhost"
 }
+postgresql_config = {
+  adapter: "future_enabled_postgresql",
+  database: "test",
+  username: "root",
+  database: "activerecord_futures_test",
+  host: "localhost"
+}
+
+config_var = "#{ENV['ADAPTER']}_config"
+if local_variables.include?(config_var.to_sym)
+  config = eval(config_var)
+  puts "Using #{config_var} configuration"
+else
+  config = mysql_config
+  puts "Using mysql_config configuration"
+end
 
 ActiveRecord::Base.establish_connection(config)
 require 'db/schema'
