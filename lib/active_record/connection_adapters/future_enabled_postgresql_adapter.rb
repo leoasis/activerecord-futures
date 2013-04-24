@@ -1,4 +1,5 @@
 require 'active_record/connection_adapters/postgresql_adapter'
+require "active_record/connection_adapters/future_enabled"
 
 module ActiveRecord
   class Base
@@ -24,45 +25,27 @@ module ActiveRecord
 
   module ConnectionAdapters
     class FutureEnabledPostgreSQLAdapter < PostgreSQLAdapter
-      def supports_futures?
-        true
-      end
+      include FutureEnabled
 
-      def exec_query(sql, name = 'SQL', binds = [])
-        my_future = Futures::Future.current
-
-        # default behavior if not a current future
-        return super unless my_future
-
-        # return fulfilled result, if exists, to load the relation
-        return my_future.result if my_future.fulfilled?
-
-        futures = Futures::Future.all
-
-        futures_sql = futures.map(&:to_sql).join(';')
-        name = "#{name} (fetching Futures)"
-
-        result = log(futures_sql, name, binds) do
+      def future_execute(sql, name)
+        log(sql, name) do
           # Clear the queue
           @connection.get_last_result
-          @connection.send_query(futures_sql)
+          @connection.send_query(sql)
           @connection.block
-          to_result(@connection.get_result)
+          @connection.get_result
         end
-
-        futures.each do |future|
-          future.fulfill(result)
-          result = to_result(@connection.get_result)
-        end
-
-        my_future.result
       end
 
-      def to_result(raw_result)
+      def build_active_record_result(raw_result)
         return if raw_result.nil?
         result =  ActiveRecord::Result.new(raw_result.fields, result_as_array(raw_result))
         raw_result.clear
         result
+      end
+
+      def next_result
+        @connection.get_result
       end
     end
   end

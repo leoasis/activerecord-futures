@@ -20,4 +20,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activerecord', '>= 3.2.13'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'rspec-spies'
+  gem.add_development_dependency 'mysql2', '>= 0.3.12.b1'
+  gem.add_development_dependency 'pg'
 end

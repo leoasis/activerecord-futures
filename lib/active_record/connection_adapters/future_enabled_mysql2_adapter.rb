@@ -1,5 +1,5 @@
 require "active_record/connection_adapters/mysql2_adapter"
-
+require "active_record/connection_adapters/future_enabled"
 module ActiveRecord
   class Base
     def self.future_enabled_mysql2_connection(config)
@@ -18,33 +18,18 @@ module ActiveRecord
 
   module ConnectionAdapters
     class FutureEnabledMysql2Adapter < Mysql2Adapter
+      include FutureEnabled
 
-      def supports_futures?
-        true
+      def future_execute(sql, name)
+        execute(sql, name)
       end
 
-      def exec_query(sql, name = 'SQL', binds = [])
-        my_future = Futures::Future.current
+      def build_active_record_result(raw_result)
+        ActiveRecord::Result.new(raw_result.fields, raw_result.to_a)
+      end
 
-        # default behavior if not a current future
-        return super unless my_future
-
-        # return fulfilled result, if exists, to load the relation
-        return my_future.result if my_future.fulfilled?
-
-        futures = Futures::Future.all
-
-        futures_sql = futures.map(&:to_sql).join(';')
-        name = "#{name} (fetching Futures)"
-
-        result = execute(futures_sql, name)
-
-        futures.each do |future|
-          future.fulfill(ActiveRecord::Result.new(result.fields, result.to_a))
-          result = @connection.store_result if @connection.next_result
-        end
-
-        my_future.result
+      def next_result
+        @connection.store_result if @connection.next_result
       end
     end
   end
