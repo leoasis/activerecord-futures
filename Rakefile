@@ -1,10 +1,16 @@
 require "bundler/gem_tasks"
+require 'rspec/core/rake_task'
 
-task :default => [:spec]
+RSpec::Core::RakeTask.new(:spec)
 
-desc "Runs the specs"
-task :spec do
+task :default => :spec
+
+desc "Runs the specs with all databases"
+task :all do
+  success = true
   ["mysql", "postgresql"].each do |adapter|
-    system({ "ADAPTER" => adapter }, "bundle exec rspec")
+    status = system({ "ADAPTER" => adapter }, "bundle exec rspec")
+    success &&= status
   end
+  abort unless success
 end

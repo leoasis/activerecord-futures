@@ -1,29 +1,23 @@
 require 'activerecord-futures'
 
-mysql_config = {
-  adapter: "future_enabled_mysql2",
-  database: "test",
-  username: "root",
-  password: "root",
-  database: "activerecord_futures_test",
-  host: "localhost"
-}
-postgresql_config = {
-  adapter: "future_enabled_postgresql",
-  database: "test",
-  username: "root",
-  database: "activerecord_futures_test",
-  host: "localhost"
+configs = {
+  mysql: {
+    adapter: "future_enabled_mysql2",
+    database: "activerecord_futures_test",
+    username: "root",
+    encoding: "utf8"
+  },
+  postgresql: {
+    adapter: "future_enabled_postgresql",
+    database: "activerecord_futures_test",
+    username: "postgres"
+  }
 }
 
-config_var = "#{ENV['ADAPTER']}_config"
-if local_variables.include?(config_var.to_sym)
-  config = eval(config_var)
-  puts "Using #{config_var} configuration"
-else
-  config = mysql_config
-  puts "Using mysql_config configuration"
-end
+env_config = ENV['ADAPTER'].try(:to_sym)
+config_key = configs.keys.include?(env_config) ? env_config : :mysql
+config = configs[config_key]
+puts "Using #{config_key} configuration"
 
 ActiveRecord::Base.establish_connection(config)
 require 'db/schema'
