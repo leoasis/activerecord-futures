@@ -8,8 +8,10 @@ module ActiveRecord
       def exec_query(sql, name = 'SQL', binds = [])
         my_future = Futures::Future.current
 
-        # default behavior if not a current future
-        return super unless my_future
+        # default behavior if not a current future or not executing
+        # the current future's sql (some adapters like PostgreSQL
+        # may execute some attribute queries during a relation evaluation)
+        return super unless my_future && my_future.to_sql == sql
 
         # return fulfilled result, if exists, to load the relation
         return my_future.result if my_future.fulfilled?

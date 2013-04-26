@@ -10,16 +10,24 @@ describe "future_count method" do
     arel.to_sql
   end
 
+  before do
+    Post.create(published_at: Time.new(2012, 12, 10))
+    Post.create(published_at: Time.new(2012, 6, 23))
+    Post.create(published_at: Time.new(2013, 4, 5))
+  end
+
   describe "#value" do
-    let(:value) { -> { count.value } }
+    let(:calling_value) { -> { count.value } }
 
     specify do
-      value.should exec(1).query
+      calling_value.should exec(1).query
     end
 
     specify do
-      value.should exec_query(count_sql)
+      calling_value.should exec_query(count_sql)
     end
+
+    specify { count.value.should eq 2 }
 
     context "executing it twice" do
       before do
@@ -27,8 +35,10 @@ describe "future_count method" do
       end
 
       specify do
-        value.should exec(0).queries
+        calling_value.should exec(0).queries
       end
+
+      specify { count.value.should eq 2 }
     end
   end
 end
