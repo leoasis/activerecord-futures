@@ -1,7 +1,7 @@
 module ActiveRecord
   module Futures
     class FutureRelation < Future
-      include Delegation
+      include ActiveRecord::Delegation
 
       attr_reader :relation
       private :relation

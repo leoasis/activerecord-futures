@@ -1,7 +1,7 @@
 module ActiveRecord
   module Futures
     class FuturePluck < Future
-      include Delegation
+      include ActiveRecord::Delegation
 
       attr_reader :query, :execution
       private :query, :execution
