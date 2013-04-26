@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/leoasis/activerecord-futures.png)](https://travis-ci.org/leoasis/activerecord-futures)
 [![Code Climate](https://codeclimate.com/github/leoasis/activerecord-futures.png)](https://codeclimate.com/github/leoasis/activerecord-futures)
+[![Coverage Status](https://coveralls.io/repos/leoasis/activerecord-futures/badge.png?branch=master)](https://coveralls.io/r/leoasis/activerecord-futures)
+
 
 Define future queries in ActiveRecord that will get executed in a single round trip to the database.
 

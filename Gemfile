@@ -7,6 +7,8 @@ group :test do
   gem 'rake'
 end
 
+gem 'coveralls', require: false
+
 if ENV['activerecord']
   gem "activerecord", ENV['activerecord']
 end
