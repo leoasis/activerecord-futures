@@ -11,18 +11,13 @@ module ActiveRecord
     end
 
     def future
-      supports_futures = connection.respond_to?(:supports_futures?) &&
-                         connection.supports_futures?
-
-      # simply pass through if the connection adapter does not support
-      # futures
-      supports_futures ? FutureRelation.new(self) : self
+      FutureRelation.new(self)
     end
 
     def future_pluck(column_name)
       exec = lambda { pluck(column_name) }
       query = record_query(&exec)
-      FutureCalculationArray.new(query, exec)
+      FutureCalculationArray.new(self, query, exec)
     end
 
     method_table = Hash[future_calculation_methods.zip(original_calculation_methods)]
@@ -33,7 +28,7 @@ module ActiveRecord
       define_method(future_method) do |*args, &block|
         exec = lambda { send(method, *args, &block) }
         query = record_query(&exec)
-        FutureCalculationValue.new(query, exec)
+        FutureCalculationValue.new(self, query, exec)
       end
     end
   end

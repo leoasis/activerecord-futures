@@ -5,10 +5,12 @@ RSpec::Core::RakeTask.new(:spec)
 
 task :default => :spec
 
+ADAPTERS = %w(future_enabled_mysql2 future_enabled_postgresql postgresql mysql2)
+
 desc "Runs the specs with all databases"
 task :all do
   success = true
-  ["mysql", "postgresql"].each do |adapter|
+  ADAPTERS.each do |adapter|
     status = system({ "ADAPTER" => adapter }, "bundle exec rspec")
     success &&= status
   end

@@ -21,7 +21,8 @@ module ActiveRecord::Futures
         context "the future" do
           subject { future }
 
-          it { should be_fulfilled }
+          it(nil, :supporting_adapter) { should be_fulfilled }
+          it(nil, :not_supporting_adapter) { should_not be_fulfilled }
         end
       end
     end
@@ -46,11 +47,13 @@ module ActiveRecord::Futures
         its(:all) { should have(0).futures }
 
         context "the first relation future" do
-          specify { future.should be_fulfilled }
+          specify(nil, :supporting_adapter) { future.should be_fulfilled }
+          specify(nil, :not_supporting_adapter) { future.should_not be_fulfilled }
         end
 
         context "the other relation future" do
-          specify { another_future.should be_fulfilled }
+          specify(nil, :supporting_adapter) { another_future.should be_fulfilled }
+          specify(nil, :not_supporting_adapter) { another_future.should_not be_fulfilled }
         end
       end
 

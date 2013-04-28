@@ -39,9 +39,11 @@ module ActiveRecord
       end
 
 
-      attr_reader :result
+      attr_reader :result, :relation
+      private :relation
 
-      def initialize
+      def initialize(relation)
+        @relation = relation
         Future.register(self)
       end
 
@@ -54,6 +56,10 @@ module ActiveRecord
       end
 
       def load
+        # Only perform a load if the adapter supports futures.
+        # This allows to fallback to normal query execution in futures
+        # when the adapter does not support futures.
+        return unless connection_supports_futures?
         Future.current = self
         execute
         Future.current = nil
@@ -75,6 +81,11 @@ module ActiveRecord
       def executed?
       end
       undef_method :executed?
+
+      def connection_supports_futures?
+        conn = relation.connection
+        conn.respond_to?(:supports_futures?) && conn.supports_futures?
+      end
 
     end
   end

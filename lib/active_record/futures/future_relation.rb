@@ -3,12 +3,8 @@ module ActiveRecord
     class FutureRelation < Future
       include ActiveRecord::Delegation
 
-      attr_reader :relation
-      private :relation
-
       def initialize(relation)
-        super()
-        @relation = relation
+        super
         @klass = relation.klass
 
         # Eagerly get sql from relation, since PostgreSQL adapter may use the

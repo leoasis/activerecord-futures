@@ -2,7 +2,15 @@ require "spec_helper"
 
 module ActiveRecord::Futures
   describe FutureRelation do
-    let(:relation) { double(ActiveRecord::Relation, klass: Class.new, to_a: nil, to_sql: "select 1") }
+    let(:relation) do
+      double(ActiveRecord::Relation, {
+        klass: Class.new,
+        to_a: nil,
+        to_sql: "select 1",
+        connection: double("connection", supports_futures?: true)
+      })
+    end
+
     subject { FutureRelation.new(relation) }
 
     describe ".new" do

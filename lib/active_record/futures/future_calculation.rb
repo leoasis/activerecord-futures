@@ -4,8 +4,8 @@ module ActiveRecord
       attr_reader :query, :execution
       private :query, :execution
 
-      def initialize(query, execution)
-        super()
+      def initialize(relation, query, execution)
+        super(relation)
         @query = query
         @execution = execution
       end
