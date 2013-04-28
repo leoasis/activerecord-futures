@@ -10,8 +10,6 @@ module ActiveRecord
         @execution = execution
       end
 
-      fetch_with(:value) { @value }
-
       def inspect
         value.inspect
       end
