@@ -29,11 +29,11 @@ module ActiveRecord
         end
 
       private
-        def fetch_with(method, &block)
+        def fetch_with(method)
           define_method(method) do
             # Flush all the futures upon first attempt to exec a future
             Future.flush unless executed?
-            instance_eval(&block)
+            execute
           end
         end
       end

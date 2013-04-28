@@ -1,7 +1,7 @@
 module ActiveRecord
   module Futures
     class FutureCalculationValue < FutureCalculation
-      fetch_with(:value) { @value }
+      fetch_with(:value)
     end
   end
 end

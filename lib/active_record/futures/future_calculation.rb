@@ -21,8 +21,9 @@ module ActiveRecord
     private
 
       def execute
-        @value = execution.call
+        @value = execution.call unless executed?
         @executed = true
+        @value
       end
 
       def executed?

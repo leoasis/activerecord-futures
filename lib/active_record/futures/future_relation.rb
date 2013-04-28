@@ -18,7 +18,7 @@ module ActiveRecord
         @query = relation.to_sql
       end
 
-      fetch_with(:to_a) { execute }
+      fetch_with(:to_a)
 
       def to_sql
         @query
