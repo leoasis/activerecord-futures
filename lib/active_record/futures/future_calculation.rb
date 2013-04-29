@@ -10,10 +10,6 @@ module ActiveRecord
         @execution = execution
       end
 
-      def inspect
-        value.inspect
-      end
-
       def to_sql
         query
       end

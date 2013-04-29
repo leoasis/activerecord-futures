@@ -100,8 +100,3 @@ and retrieving the results via `get_result`.
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-## Roadmap
-
-1. Fallback to normal queries when adapter does not support futures
-2. Think of a way to use the normal adapters

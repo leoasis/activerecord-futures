@@ -65,10 +65,6 @@ module ActiveRecord
         Future.current = nil
       end
 
-      def inspect
-        to_a.inspect
-      end
-
       def to_sql
       end
       undef_method :to_sql
