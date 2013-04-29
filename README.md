@@ -72,26 +72,37 @@ executed whenever `#to_a` gets executed. Note that, as ActiveRecord does, enumer
 so things like `#each`, `#map`, `#collect` all trigger the future.
 
 Also, ActiveRecord::Relation instances get all the calculation methods provided by the ActiveRecord::Calculations module
-"futurized", that means, for `#count` you get `#future_count`, for `#sum` you get `#future_sum` and so on. These future
-calculations are triggered by executing the `#value` method, which also return the actual result of the calculation.
+"futurized", that means, for `#count` you get `#future_count`, for `#sum` you get `#future_sum` and so on. If the calculation
+returns a list of values, for example with a `#future_pluck` or a grouped `#future_count`, the future will be triggered with
+the `#to_a` method (or any of the methods that delegate to `#to_a`). If it returns a single value, the future will be 
+triggered when you execute the `#value` method.
 
 ## Database support
 
 ### SQlite
 
-SQlite doesn't support multiple statement queries. Currently this gem doesn't fall back to the normal behavior if the
-adapter does not support futures, but this is in the road map :)
+SQlite doesn't support multiple statement queries. ActiveRecord::Futures will fall back to normal query execution, that is,
+it will execute the future's query whenever the future is triggered, but it will not execute the other futures' queries.
 
 ### MySQL
 
 Multi statement queries are supported by the mysql2 gem since version 0.3.12b1, so you'll need to use that one or a newer
 one.
-Currently the adapter provided inherits the built-in one in Rails, and it also sets the MULTI_STATEMENTS flag to allow multiple queries in a single command.
+Currently the adapter provided inherits the built-in one in Rails, and it also sets the MULTI_STATEMENTS flag to allow 
+multiple queries in a single command.
+If you have an older version of the gem, ActiveRecord::Futures will fall back to normal query execution.
 
 ### Postgres
 
 The pg gem supports multiple statement queries by using the `send_query` method
 and retrieving the results via `get_result`.
+
+### Other databases
+
+In general, ActiveRecord::Futures will look for a method `#supports_futures?` in the adapter. So any adapter that returns
+false when calling the method, or does not respond to it, will fall back to normal query execution.
+If you want to have support for ActiveRecord::Futures with your database, feel free to create a pull request with it, or
+create your own gem, or just create an issue.
 
 ## Contributing
 
