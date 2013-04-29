@@ -20,6 +20,22 @@ module ActiveRecord
     class FutureEnabledMysql2Adapter < Mysql2Adapter
       include FutureEnabled
 
+      def initialize(*args)
+        super
+        unless supports_futures?
+          logger.warn("ActiveRecord::Futures - You're using the mysql2 future "\
+            "enabled adapter with an old version of the mysql2 gem. You must "\
+            "use a mysql2 gem version higher than or equal to 0.3.12b1 to take "\
+            "advantage of futures.\nFalling back to normal query execution behavior.")
+        end
+      end
+
+      def supports_futures?
+        # Support only if the mysql client allows fetching multiple statements
+        # results
+        @connection.respond_to?(:store_result)
+      end
+
       def future_execute(sql, name)
         execute(sql, name)
       end
