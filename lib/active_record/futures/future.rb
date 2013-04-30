@@ -35,6 +35,10 @@ module ActiveRecord
             Future.flush unless executed?
             execute
           end
+
+          define_method(:inspect) do
+            send(method).inspect
+          end
         end
       end
 

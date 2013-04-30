@@ -60,5 +60,22 @@ module ActiveRecord::Futures
         Future.current.should == nil
       end
     end
+
+    describe "#inspect" do
+      let(:resulting_array) { double(Array, inspect: nil) }
+
+      before do
+        relation.stub(loaded?: true)
+        relation.stub(:to_a).and_return(resulting_array)
+
+        subject.inspect
+      end
+
+      it { should be_executed }
+
+      it "delegates to relation.to_a.inspect" do
+        resulting_array.should have_received(:inspect)
+      end
+    end
   end
 end
