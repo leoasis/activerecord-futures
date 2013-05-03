@@ -67,31 +67,31 @@ describe "future_count method" do
       Comment.create(post: post_2)
     end
 
-    describe "#to_a" do
-      let(:calling_to_a) { -> { count.to_a } }
+    describe "#value" do
+      let(:calling_value) { -> { count.value } }
 
       specify do
-        calling_to_a.should exec(1).query
+        calling_value.should exec(1).query
       end
 
       specify do
-        calling_to_a.should exec_query(count_sql)
+        calling_value.should exec_query(count_sql)
       end
 
-      specify { count.to_a[post_1.id].should eq 2 }
-      specify { count.to_a[post_2.id].should eq 3 }
+      specify { count.value[post_1.id].should eq 2 }
+      specify { count.value[post_2.id].should eq 3 }
 
       context "executing it twice" do
         before do
-          count.to_a
+          count.value
         end
 
         specify do
-          calling_to_a.should exec(0).queries
+          calling_value.should exec(0).queries
         end
 
-        specify { count.to_a[post_1.id].should eq 2 }
-        specify { count.to_a[post_2.id].should eq 3 }
+        specify { count.value[post_1.id].should eq 2 }
+        specify { count.value[post_2.id].should eq 3 }
       end
     end
   end
