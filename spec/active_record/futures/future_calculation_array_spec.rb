@@ -4,6 +4,8 @@ module ActiveRecord::Futures
   describe FutureCalculationArray do
     let(:relation) do
       double(ActiveRecord::Relation, {
+        klass: Class.new,
+        arel: nil,
         connection: double("connection", supports_futures?: true)
       })
     end
@@ -24,6 +26,11 @@ module ActiveRecord::Futures
       it "delegates to exec result's inspect" do
         exec_result.should have_received(:inspect)
       end
+    end
+
+    describe "unknown method" do
+      let(:method_call) { ->{ subject.unknown } }
+      specify { method_call.should raise_error(NoMethodError) }
     end
   end
 end

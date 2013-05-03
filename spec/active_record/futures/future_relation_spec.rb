@@ -5,6 +5,7 @@ module ActiveRecord::Futures
     let(:relation) do
       double(ActiveRecord::Relation, {
         klass: Class.new,
+        arel: nil,
         to_a: nil,
         to_sql: "select 1",
         connection: double("connection", supports_futures?: true)
@@ -76,6 +77,11 @@ module ActiveRecord::Futures
       it "delegates to relation.to_a.inspect" do
         resulting_array.should have_received(:inspect)
       end
+    end
+
+    describe "unknown method" do
+      let(:method_call) { ->{ subject.unknown } }
+      specify { method_call.should raise_error(NoMethodError) }
     end
   end
 end

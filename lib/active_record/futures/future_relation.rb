@@ -2,6 +2,7 @@ module ActiveRecord
   module Futures
     class FutureRelation < Future
       include ActiveRecord::Delegation
+      delegate :arel, to: :relation
 
       def initialize(relation)
         super
