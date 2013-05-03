@@ -73,10 +73,9 @@ executed whenever `#to_a` gets executed. Note that, as ActiveRecord does, enumer
 so things like `#each`, `#map`, `#collect` all trigger the future.
 
 Also, ActiveRecord::Relation instances get all the calculation methods provided by the ActiveRecord::Calculations module
-"futurized", that means, for `#count` you get `#future_count`, for `#sum` you get `#future_sum` and so on. If the calculation
-returns a list of values, for example with a `#future_pluck` or a grouped `#future_count`, the future will be triggered with
-the `#to_a` method (or any of the methods that delegate to `#to_a`). If it returns a single value, the future will be 
-triggered when you execute the `#value` method.
+"futurized", that means, for `#count` you get `#future_count`, for `#sum` you get `#future_sum` and so on. All future 
+calculations are triggered with the `#value` method, except for the `#future_pluck` method, that returns an array, and is
+triggered with a `#to_a` method (or any other method that delegates to it).
 
 ## Database support
 
