@@ -4,7 +4,7 @@ module ActiveRecord
       include ActiveRecord::Delegation
       delegate :arel, to: :relation
 
-      def initialize(relation, query, execution)
+      def initialize(relation, query, binds, execution)
         super
         @klass = relation.klass
       end

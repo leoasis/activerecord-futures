@@ -27,13 +27,27 @@ module ActiveRecord
     class FutureEnabledPostgreSQLAdapter < PostgreSQLAdapter
       include FutureEnabled
 
-      def future_execute(sql, name)
-        log(sql, name) do
-          # Clear the queue
-          @connection.get_last_result
-          @connection.send_query(sql)
-          @connection.block
-          @connection.get_result
+      def future_execute(arels, binds, name)
+        sql = arels.zip(binds).map { |arel, bind| to_sql(arel, bind.try(:dup)) }.join(';')
+        binds = binds.flatten(1).compact
+
+        log(sql, name, binds) do
+
+          if binds.empty?
+            # Clear the queue
+            @connection.get_last_result
+            @connection.send_query(sql)
+            @connection.block
+            @connection.get_result
+          else
+            # Clear the queue
+            @connection.get_last_result
+            @connection.send_query(sql, binds.map { |col, val|
+              type_cast(val, col)
+            })
+            @connection.block
+            @connection.get_result
+          end
         end
       end
 

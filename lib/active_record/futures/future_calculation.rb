@@ -1,12 +1,13 @@
 module ActiveRecord
   module Futures
     class FutureCalculation < Future
-      attr_reader :query, :execution
-      private :query, :execution
+      attr_reader :query, :binds, :execution
+      private :execution
 
-      def initialize(relation, query, execution)
+      def initialize(relation, query, binds, execution)
         super(relation)
         @query = query
+        @binds = binds
         @execution = execution
       end
 

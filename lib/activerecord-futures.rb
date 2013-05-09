@@ -10,6 +10,8 @@ require "active_record/futures/future_calculation_array"
 
 require "active_record/futures/proxy"
 require "active_record/futures/query_recording"
+require "active_record/futures/finder_methods"
+require "active_record/futures/calculation_methods"
 require "active_record/futures"
 require "active_record/futures/delegation"
 

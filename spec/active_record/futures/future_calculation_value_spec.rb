@@ -12,7 +12,7 @@ module ActiveRecord::Futures
     let(:exec_result) { double("exec result", inspect: nil) }
     let(:exec) { ->{ exec_result } }
 
-    subject { FutureCalculationValue.new(relation, query, exec) }
+    subject { FutureCalculationValue.new(relation, query, nil, exec) }
 
     describe "#inspect" do
       before do

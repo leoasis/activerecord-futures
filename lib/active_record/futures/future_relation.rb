@@ -3,6 +3,7 @@ module ActiveRecord
     class FutureRelation < Future
       include ActiveRecord::Delegation
       delegate :arel, to: :relation
+      attr_reader :query, :binds
 
       def initialize(relation)
         super
@@ -13,6 +14,7 @@ module ActiveRecord
         # `to_sql`, and that will cause an infinite loop if a current future
         # exists
         @query = relation.to_sql
+        @binds = []
       end
 
       fetch_with(:to_a)

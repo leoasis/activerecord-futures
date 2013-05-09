@@ -36,7 +36,8 @@ module ActiveRecord
         @connection.respond_to?(:store_result)
       end
 
-      def future_execute(sql, name)
+      def future_execute(arels, binds, name)
+        sql = arels.zip(binds).map { |arel, bind| to_sql(arel, bind.try(:dup)) }.join(';')
         execute(sql, name)
       end
 

@@ -11,16 +11,17 @@ module ActiveRecord
         # default behavior if not a current future or not executing
         # the current future's sql (some adapters like PostgreSQL
         # may execute some attribute queries during a relation evaluation)
-        return super unless my_future && my_future.to_sql == sql
+        return super if !my_future || to_sql(my_future.query, my_future.binds.try(:dup)) != sql
 
         # return fulfilled result, if exists, to load the relation
         return my_future.result if my_future.fulfilled?
 
         futures = Futures::Future.all
-        futures_sql = futures.map(&:to_sql).join(';')
+        future_arels = futures.map(&:query)
+        future_binds = futures.map(&:binds)
         name = "#{name} (fetching Futures)"
 
-        result = future_execute(futures_sql, name)
+        result = future_execute(future_arels, future_binds, name)
 
         futures.each do |future|
           future.fulfill(build_active_record_result(result))

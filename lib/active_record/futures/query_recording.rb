@@ -8,7 +8,8 @@ module ActiveRecord
         connection = ConnectionProxy.new(@klass.connection)
         @klass = KlassProxy.new(@klass, connection)
         yield
-        connection.recorded_query
+        @loaded = false
+        [connection.recorded_query, connection.recorded_binds]
       ensure
         @klass = orig_klass
       end
@@ -27,11 +28,17 @@ module ActiveRecord
           scope.instance_variable_set(:@klass, self)
           scope
         end
+
+        def find_by_sql(sql, binds = [])
+          connection.recorded_query = sanitize_sql(sql)
+          connection.recorded_binds = binds
+          []
+        end
       end
 
       class ConnectionProxy < Proxy
         attr_reader :connection
-        attr_accessor :recorded_query
+        attr_accessor :recorded_query, :recorded_binds
 
         def initialize(connection)
           super(connection)
@@ -39,12 +46,12 @@ module ActiveRecord
         end
 
         def select_value(arel, name = nil)
-          self.recorded_query = arel.to_sql
+          self.recorded_query = arel
           nil
         end
 
         def select_all(arel, name = nil, binds = [])
-          self.recorded_query = arel.to_sql
+          self.recorded_query = arel
           []
         end
       end
