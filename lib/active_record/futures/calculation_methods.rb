@@ -4,9 +4,7 @@ module ActiveRecord
       extend ActiveSupport::Concern
 
       def future_pluck(*args, &block)
-        exec = lambda { pluck(*args, &block) }
-        query, binds = record_query(&exec)
-        FutureCalculationArray.new(self, query, binds, exec)
+        FutureArray.new(record_future(:pluck, *args, &block))
       end
 
       included do
@@ -16,9 +14,7 @@ module ActiveRecord
         #
         methods.each do |method|
           define_method(futurize(method)) do |*args, &block|
-            exec = lambda { send(method, *args, &block) }
-            query, binds = record_query(&exec)
-            FutureCalculationValue.new(self, query, binds, exec)
+            FutureValue.new(record_future(method, *args, &block))
           end
         end
       end

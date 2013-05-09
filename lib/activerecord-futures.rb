@@ -2,11 +2,10 @@ require 'active_record'
 require 'active_support/core_ext/module/delegation'
 require "activerecord-futures/version"
 
+require "active_record/futures/future_registry"
 require "active_record/futures/future"
-require "active_record/futures/future_relation"
-require "active_record/futures/future_calculation"
-require "active_record/futures/future_calculation_value"
-require "active_record/futures/future_calculation_array"
+require "active_record/futures/future_array"
+require "active_record/futures/future_value"
 
 require "active_record/futures/proxy"
 require "active_record/futures/query_recording"

@@ -1,90 +1,63 @@
-require 'spec_helper'
+require "spec_helper"
 
 module ActiveRecord::Futures
   describe Future do
-    context "class methods" do
-      describe ".futures" do
-        context "with futures in two threads" do
-          let(:futures_key) { "#{Future.name}_futures" }
+    let(:relation) do
+      double(ActiveRecord::Relation, {
+         connection: double("connection", supports_futures?: true)
+      })
+    end
 
-          let(:a_thread) do
-            thread = double("Thread 1")
-            thread.stub(:[]).with(futures_key).and_return([])
-            thread
-          end
+    let(:query) { double("A query") }
+    let(:binds) { double("Some query binds") }
+    let(:execution) { double("The query execution", call: nil) }
 
-          let(:another_thread) do
-            thread = double("Thread 2")
-            thread.stub(:[]).with(futures_key).and_return([])
-            thread
-          end
+    subject { Future.new(relation, query, binds, execution) }
 
-          before do
-            Thread.stub(:current).and_return(a_thread)
+    describe ".new" do
+      before { FutureRegistry.stub(:register) }
+      before { subject }
 
-            Future.futures << "Future 1"
-            Future.futures << "Future 2"
-
-            Thread.stub(:current).and_return(another_thread)
-
-            Future.futures << "Future 3"
-            Future.futures << "Future 4"
-          end
-
-          context "the futures in thread 1" do
-            let(:futures) { a_thread[futures_key] }
-
-            specify { futures.should include("Future 1") }
-            specify { futures.should include("Future 2") }
-            specify { futures.should_not include("Future 3") }
-            specify { futures.should_not include("Future 4") }
-          end
-
-          context "the futures in thread 2" do
-            let(:futures) { another_thread[futures_key] }
-
-            specify { futures.should_not include("Future 1") }
-            specify { futures.should_not include("Future 2") }
-            specify { futures.should include("Future 3") }
-            specify { futures.should include("Future 4") }
-          end
-        end
+      it "gets registered" do
+        FutureRegistry.should have_received(:register).with(subject)
       end
 
-      describe ".current" do
-        context "with currents in two threads" do
-          let(:current_key) { "#{Future.name}_current" }
+      its(:query) { should eq query }
+      its(:binds) { should eq binds }
 
-          let(:a_thread) do
-            thread = Hash.new
-          end
+      it { should_not be_fulfilled }
+    end
 
-          let(:another_thread) do
-            thread = Hash.new
-          end
+    describe "#fulfill" do
+      let(:result) { "Some cool result" }
 
-          before do
-            Thread.stub(:current).and_return(a_thread)
+      before do
+        subject.fulfill(result)
+      end
 
-            Future.current = "Future 1"
+      it { should be_fulfilled }
+    end
 
-            Thread.stub(:current).and_return(another_thread)
-
-            Future.current = "Future 2"
-          end
-
-          context "the current in thread 1" do
-            let(:current) { a_thread[current_key] }
-
-            specify { current.should eq "Future 1" }
-          end
-
-          context "the current in thread 2" do
-            let(:current) { another_thread[current_key] }
-
-            specify { current.should eq "Future 2" }
-          end
+    describe "#load" do
+      before do
+        execution.stub(:call) do
+          @current_future = FutureRegistry.current
+          nil
         end
+
+        subject.load
+      end
+
+      it "calls the execution" do
+        execution.should have_received(:call)
+      end
+
+      it "sets the current future to itself while execution was being called in the relation" do
+        @current_future.should == subject
+      end
+
+      it "sets to nil the current future afterwards" do
+        FutureRegistry.current.should == nil
       end
     end
   end

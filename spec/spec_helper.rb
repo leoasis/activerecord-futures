@@ -65,6 +65,6 @@ RSpec.configure do |config|
   end
 
   config.after do
-    ActiveRecord::Futures::Future.clear
+    ActiveRecord::Futures::FutureRegistry.clear
   end
 end

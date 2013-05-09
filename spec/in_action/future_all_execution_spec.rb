@@ -3,8 +3,9 @@ require 'spec_helper'
 describe "future_all method" do
   context "with no parameters" do
     let(:relation) { Post.where("published_at < ?", Time.new(2013, 1, 1)) }
-    let(:find) { relation.future_all }
-    let(:find_sql) do
+    let(:all) { relation.future_all }
+    let(:all_execution) { all.send(:future_execution) }
+    let(:all_sql) do
       relation.to_sql
     end
 
@@ -15,38 +16,38 @@ describe "future_all method" do
     end
 
     describe "#to_a" do
-      let(:calling_to_a) { -> { find.to_a } }
+      let(:calling_to_a) { -> { all.to_a } }
 
-      specify(nil, :supporting_adapter) { find.should_not be_fulfilled }
+      specify(nil, :supporting_adapter) { all_execution.should_not be_fulfilled }
 
       specify do
         calling_to_a.should exec(1).query
       end
 
       specify do
-        calling_to_a.should exec_query(find_sql)
+        calling_to_a.should exec_query(all_sql)
       end
 
-      specify { find.to_a.should eq relation.all }
+      specify { all.to_a.should eq relation.all }
 
       context "after executing the future" do
         before do
-          find.to_a
+          all.to_a
         end
 
-        specify(nil, :supporting_adapter) { find.should be_fulfilled }
+        specify(nil, :supporting_adapter) { all_execution.should be_fulfilled }
       end
 
       context "executing it twice" do
         before do
-          find.to_a
+          all.to_a
         end
 
         specify do
           calling_to_a.should exec(0).queries
         end
 
-        specify { find.to_a.should eq relation.all }
+        specify { all.to_a.should eq relation.all }
       end
     end
   end

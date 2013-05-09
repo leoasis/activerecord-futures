@@ -3,6 +3,7 @@ require 'spec_helper'
 describe "future_first method" do
   let(:relation) { Post.where("published_at < ?", Time.new(2013, 1, 1)) }
   let(:first) { relation.future_first }
+  let(:first_execution) { first.send(:future_execution) }
   let(:first_sql) do
     arel = relation.arel
     arel.limit = 1
@@ -18,7 +19,7 @@ describe "future_first method" do
   describe "#value" do
     let(:calling_value) { -> { first.value } }
 
-    specify(nil, :supporting_adapter) { first.should_not be_fulfilled }
+    specify(nil, :supporting_adapter) { first_execution.should_not be_fulfilled }
 
     specify do
       calling_value.should exec(1).query
@@ -35,7 +36,7 @@ describe "future_first method" do
         first.value
       end
 
-      specify(nil, :supporting_adapter) { first.should be_fulfilled }
+      specify(nil, :supporting_adapter) { first_execution.should be_fulfilled }
     end
 
     context "executing it twice" do

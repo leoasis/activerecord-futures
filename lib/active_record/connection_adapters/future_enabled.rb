@@ -6,7 +6,7 @@ module ActiveRecord
       end
 
       def exec_query(sql, name = 'SQL', binds = [])
-        my_future = Futures::Future.current
+        my_future = Futures::FutureRegistry.current
 
         # default behavior if not a current future or not executing
         # the current future's sql (some adapters like PostgreSQL
@@ -16,7 +16,7 @@ module ActiveRecord
         # return fulfilled result, if exists, to load the relation
         return my_future.result if my_future.fulfilled?
 
-        futures = Futures::Future.all
+        futures = Futures::FutureRegistry.all
         future_arels = futures.map(&:query)
         future_binds = futures.map(&:binds)
         name = "#{name} (fetching Futures)"

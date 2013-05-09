@@ -10,7 +10,14 @@ module ActiveRecord
     include CalculationMethods
 
     def future
-      FutureRelation.new(self)
+      FutureArray.new(record_future(:to_a))
+    end
+
+  private
+    def record_future(method, *args, &block)
+      exec = -> { send(method, *args, &block) }
+      query, binds = record_query(&exec)
+      Future.new(self, query, binds, exec)
     end
   end
 end

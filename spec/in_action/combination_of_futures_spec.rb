@@ -45,7 +45,7 @@ describe "Combination of futures" do
 
     context "execs just the executed future's query", :not_supporting_adapter do
       it { should exec(1).query }
-      it { should exec_query(post_future_relation.to_sql) }
+      it { should exec_query(post_relation.to_sql) }
     end
   end
 
@@ -57,8 +57,8 @@ describe "Combination of futures" do
     context "the user future relation" do
       subject { user_future_relation }
 
-      it(nil, :supporting_adapter) { should be_fulfilled }
-      it(nil, :not_supporting_adapter) { should_not be_fulfilled }
+      it(nil, :supporting_adapter) { execution(subject).should be_fulfilled }
+      it(nil, :not_supporting_adapter) { execution(subject).should_not be_fulfilled }
 
       describe "#to_a" do
         let(:calling_to_a) { ->{ subject.to_a } }
@@ -79,8 +79,8 @@ describe "Combination of futures" do
     context "the user future value" do
       subject { user_future_value }
 
-      it(nil, :supporting_adapter) { should be_fulfilled }
-      it(nil, :not_supporting_adapter) { should_not be_fulfilled }
+      it(nil, :supporting_adapter) { execution(subject).should be_fulfilled }
+      it(nil, :not_supporting_adapter) { execution(subject).should_not be_fulfilled }
 
       describe "#value" do
         let(:calling_value) { ->{ subject.value } }
@@ -101,8 +101,8 @@ describe "Combination of futures" do
     context "the post future relation" do
       subject { post_future_relation }
 
-      it(nil, :supporting_adapter) { should be_fulfilled }
-      it(nil, :not_supporting_adapter) { should_not be_fulfilled }
+      it(nil, :supporting_adapter) { execution(subject).should be_fulfilled }
+      it(nil, :not_supporting_adapter) { execution(subject).should_not be_fulfilled }
 
       describe "#to_a" do
         let(:calling_to_a) { ->{ subject.to_a } }
@@ -124,8 +124,8 @@ describe "Combination of futures" do
     context "the post future value" do
       subject { post_future_value }
 
-      it(nil, :supporting_adapter) { should be_fulfilled }
-      it(nil, :not_supporting_adapter) { should_not be_fulfilled }
+      it(nil, :supporting_adapter) { execution(subject).should be_fulfilled }
+      it(nil, :not_supporting_adapter) { execution(subject).should_not be_fulfilled }
 
       describe "#value" do
         let(:calling_value) { ->{ subject.value } }
@@ -142,6 +142,10 @@ describe "Combination of futures" do
         end
       end
     end
+  end
+
+  def execution(future)
+    future.send(:future_execution)
   end
 
   def count(relation)

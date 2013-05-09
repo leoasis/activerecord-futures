@@ -1,54 +1,15 @@
 module ActiveRecord
   module Futures
     class Future
-      class << self
-        def futures
-          Thread.current["#{self.name}_futures"] ||= []
-        end
-        alias_method :all, :futures
+      attr_reader :result, :relation, :query, :binds, :execution
+      private :relation, :execution
 
-        def current
-          Thread.current["#{self.name}_current"]
-        end
-
-        def current=(future)
-          Thread.current["#{self.name}_current"] = future
-        end
-
-        def clear
-          all.clear
-        end
-
-        def register(future)
-          self.futures << future
-        end
-
-        def flush
-          self.futures.each(&:load)
-          clear
-        end
-
-      private
-        def fetch_with(method)
-          define_method(method) do
-            # Flush all the futures upon first attempt to exec a future
-            Future.flush unless executed?
-            execute
-          end
-
-          define_method(:inspect) do
-            send(method).inspect
-          end
-        end
-      end
-
-
-      attr_reader :result, :relation
-      private :relation
-
-      def initialize(relation)
+      def initialize(relation, query, binds, execution)
         @relation = relation
-        Future.register(self)
+        @query = query
+        @binds = binds
+        @execution = execution
+        FutureRegistry.register(self)
       end
 
       def fulfill(result)
@@ -64,29 +25,32 @@ module ActiveRecord
         # This allows to fallback to normal query execution in futures
         # when the adapter does not support futures.
         return unless connection_supports_futures?
-        Future.current = self
-        execute
-        Future.current = nil
+        FutureRegistry.current = self
+        execute(false)
+        FutureRegistry.current = nil
       end
 
-      def to_sql
-      end
-      undef_method :to_sql
+      def execute(flush = true)
+        FutureRegistry.flush if flush && !executed?
 
-    private
-      def execute
+        unless executed?
+          # Flush all the futures upon first attempt to exec a future
+          @value = execution.call
+          @executed = true
+        end
+
+        @value
       end
-      undef_method :execute
 
       def executed?
+        @executed
       end
-      undef_method :executed?
 
+    private
       def connection_supports_futures?
         conn = relation.connection
         conn.respond_to?(:supports_futures?) && conn.supports_futures?
       end
-
     end
   end
 end

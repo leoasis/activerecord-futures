@@ -4,6 +4,7 @@ describe "future_find method" do
   context "finding by a single id" do
     let(:relation) { Post.where("published_at < ?", Time.new(2013, 1, 1)) }
     let(:find) { relation.future_find(@post_id) }
+    let(:find_execution) { find.send(:future_execution) }
     let(:find_sql) do
       arel = relation.where(id: @post_id).arel
       arel.limit = 1
@@ -27,7 +28,7 @@ describe "future_find method" do
     describe "#value" do
       let(:calling_value) { -> { find.value } }
 
-      specify(nil, :supporting_adapter) { find.should_not be_fulfilled }
+      specify(nil, :supporting_adapter) { find_execution.should_not be_fulfilled }
 
       specify do
         calling_value.should exec(1).query
@@ -48,7 +49,7 @@ describe "future_find method" do
           find.value
         end
 
-        specify(nil, :supporting_adapter) { find.should be_fulfilled }
+        specify(nil, :supporting_adapter) { find_execution.should be_fulfilled }
       end
 
       context "executing it twice" do
@@ -68,6 +69,7 @@ describe "future_find method" do
   context "finding by multiple ids" do
     let(:relation) { Post.where("published_at < ?", Time.new(2013, 1, 1)) }
     let(:find) { relation.future_find(*@post_ids) }
+    let(:find_execution) { find.send(:future_execution) }
     let(:find_sql) do
       arel = relation.where(id: @post_ids).arel
       arel.to_sql
@@ -83,7 +85,7 @@ describe "future_find method" do
     describe "#to_a" do
       let(:calling_to_a) { -> { find.to_a } }
 
-      specify(nil, :supporting_adapter) { find.should_not be_fulfilled }
+      specify(nil, :supporting_adapter) { find_execution.should_not be_fulfilled }
 
       specify do
         calling_to_a.should exec(1).query
@@ -100,7 +102,7 @@ describe "future_find method" do
           find.to_a
         end
 
-        specify(nil, :supporting_adapter) { find.should be_fulfilled }
+        specify(nil, :supporting_adapter) { find_execution.should be_fulfilled }
       end
 
       context "executing it twice" do
@@ -120,6 +122,7 @@ describe "future_find method" do
   context "finding by multiple ids, with single array parameter" do
     let(:relation) { Post.where("published_at < ?", Time.new(2013, 1, 1)) }
     let(:find) { relation.future_find(@post_ids) }
+    let(:find_execution) { find.send(:future_execution) }
     let(:find_sql) do
       arel = relation.where(id: @post_ids).arel
       arel.to_sql
@@ -135,7 +138,7 @@ describe "future_find method" do
     describe "#to_a" do
       let(:calling_to_a) { -> { find.to_a } }
 
-      specify(nil, :supporting_adapter) { find.should_not be_fulfilled }
+      specify(nil, :supporting_adapter) { find_execution.should_not be_fulfilled }
 
       specify do
         calling_to_a.should exec(1).query
@@ -152,7 +155,7 @@ describe "future_find method" do
           find.to_a
         end
 
-        specify(nil, :supporting_adapter) { find.should be_fulfilled }
+        specify(nil, :supporting_adapter) { find_execution.should be_fulfilled }
       end
 
       context "executing it twice" do

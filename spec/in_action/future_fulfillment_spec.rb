@@ -2,19 +2,20 @@ require "spec_helper"
 
 module ActiveRecord::Futures
   describe "Future fulfillment" do
-    subject { Future }
+    subject { FutureRegistry }
 
     context "when futurizing a relation" do
-      let!(:future) { Post.where(title: "Some post").future }
+      let!(:future_result) { Post.where(title: "Some post").future }
+      let!(:future) { future_result.send(:future_execution) }
 
       its(:all) { should have(1).future }
 
-      context "the relation future" do
+      context "the future" do
         specify { future.should_not be_fulfilled }
       end
 
       context "and executing it" do
-        before { future.to_a }
+        before { future_result.to_a }
 
         its(:all) { should have(0).futures }
 
@@ -28,8 +29,10 @@ module ActiveRecord::Futures
     end
 
     context "when futurizing two relations" do
-      let!(:future) { Post.where(title: "Some post").future }
-      let!(:another_future) { User.where(name: "Lenny").future }
+      let!(:future_result) { Post.where(title: "Some post").future }
+      let!(:future) { future_result.send(:future_execution) }
+      let!(:another_future_result) { User.where(name: "Lenny").future }
+      let!(:another_future) { another_future_result.send(:future_execution) }
 
       its(:all) { should have(2).futures }
 
@@ -42,7 +45,7 @@ module ActiveRecord::Futures
       end
 
       context "and executing one of them" do
-        before { future.to_a }
+        before { future_result.to_a }
 
         its(:all) { should have(0).futures }
 

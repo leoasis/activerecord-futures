@@ -18,17 +18,16 @@ module ActiveRecord
         expects_array = block_given? || args.first == :all ||
                         args.first.kind_of?(Array) || args.size > 1
 
+        future = Future.new(self, query, binds, exec)
         if expects_array
-          FutureCalculationArray.new(self, query, binds, exec)
+          FutureArray.new(future)
         else
-          FutureCalculationValue.new(self, query, binds, exec)
+          FutureValue.new(future)
         end
       end
 
       def future_all(*args, &block)
-        exec = -> { all(*args, &block) }
-        query, binds = record_query(&exec)
-        FutureCalculationArray.new(self, query, binds, exec)
+        FutureArray.new(record_future(:all, *args, &block))
       end
 
       included do
@@ -38,9 +37,7 @@ module ActiveRecord
         #
         methods.each do |method|
           define_method(futurize(method)) do |*args, &block|
-            exec = lambda { send(method, *args, &block) }
-            query, binds = record_query(&exec)
-            FutureCalculationValue.new(self, query, binds, exec)
+            FutureValue.new(record_future(method, *args, &block))
           end
         end
       end
