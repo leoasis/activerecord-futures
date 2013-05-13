@@ -3,8 +3,9 @@ require 'spec_helper'
 describe "future_count method" do
   context "single value count" do
     let(:relation) { Post.where("published_at < ?", Time.new(2013, 1, 1)) }
-    let(:count) { relation.future_count }
-    let(:count_sql) do
+    let(:future) { relation.future_count }
+    let(:relation_result) { relation.count }
+    let(:future_sql) do
       arel = relation.arel
       arel.projections = []
       arel.project("COUNT(*)")
@@ -17,37 +18,14 @@ describe "future_count method" do
       Post.create(published_at: Time.new(2013, 4, 5))
     end
 
-    describe "#value" do
-      let(:calling_value) { -> { count.value } }
-
-      specify do
-        calling_value.should exec(1).query
-      end
-
-      specify do
-        calling_value.should exec_query(count_sql)
-      end
-
-      specify { count.value.should eq 2 }
-
-      context "executing it twice" do
-        before do
-          count.value
-        end
-
-        specify do
-          calling_value.should exec(0).queries
-        end
-
-        specify { count.value.should eq 2 }
-      end
-    end
+    it_behaves_like "a futurized method", :value
   end
 
   context "grouped value count" do
     let(:relation) { Comment.scoped }
-    let(:count) { relation.future_count(group: :post_id) }
-    let(:count_sql) do
+    let(:future) { relation.future_count(group: :post_id) }
+    let(:relation_result) { relation.count(group: :post_id) }
+    let(:future_sql) do
       arel = relation.arel
       arel.projections = []
       arel.project("COUNT(*) AS count_all")
@@ -67,32 +45,6 @@ describe "future_count method" do
       Comment.create(post: post_2)
     end
 
-    describe "#value" do
-      let(:calling_value) { -> { count.value } }
-
-      specify do
-        calling_value.should exec(1).query
-      end
-
-      specify do
-        calling_value.should exec_query(count_sql)
-      end
-
-      specify { count.value[post_1.id].should eq 2 }
-      specify { count.value[post_2.id].should eq 3 }
-
-      context "executing it twice" do
-        before do
-          count.value
-        end
-
-        specify do
-          calling_value.should exec(0).queries
-        end
-
-        specify { count.value[post_1.id].should eq 2 }
-        specify { count.value[post_2.id].should eq 3 }
-      end
-    end
+    it_behaves_like "a futurized method", :value
   end
 end
