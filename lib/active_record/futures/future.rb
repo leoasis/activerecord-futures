@@ -31,10 +31,10 @@ module ActiveRecord
       end
 
       def execute(flush = true)
+        # Flush all the futures upon first attempt to exec a future
         FutureRegistry.flush if flush && !executed?
 
         unless executed?
-          # Flush all the futures upon first attempt to exec a future
           @value = execution.call
           @executed = true
         end

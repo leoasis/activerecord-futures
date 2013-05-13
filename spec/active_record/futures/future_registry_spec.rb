@@ -56,13 +56,8 @@ module ActiveRecord::Futures
       context "with currents in two threads" do
         let(:current_key) { "#{subject.name}_current" }
 
-        let(:a_thread) do
-          thread = Hash.new
-        end
-
-        let(:another_thread) do
-          thread = Hash.new
-        end
+        let(:a_thread) { Hash.new }
+        let(:another_thread) { Hash.new }
 
         before do
           Thread.stub(:current).and_return(a_thread)

@@ -15,6 +15,9 @@ module ActiveRecord
 
         args = args.dup
         args.extract_options!
+
+        # Only expect an array if a block is given, finding :all,
+        # finding by id passing an array or passing multiple ids
         expects_array = block_given? || args.first == :all ||
                         args.first.kind_of?(Array) || args.size > 1
 
