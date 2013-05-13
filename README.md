@@ -68,14 +68,41 @@ both count and page queries at once.
 
 ### Methods
 
-ActiveRecord::Relation instances get a `future` method for all queries where multiple results are returned. The future gets
-executed whenever `#to_a` gets executed. Note that, as ActiveRecord does, enumerable methods get delegated to `#to_a` also,
+#### #future method
+ActiveRecord::Relation instances get a `future` method  that futurizes a normal
+relation. The future gets executed whenever `#to_a` gets executed. Note that, as ActiveRecord does, enumerable methods get delegated to `#to_a` also,
 so things like `#each`, `#map`, `#collect` all trigger the future.
 
-Also, ActiveRecord::Relation instances get all the calculation methods provided by the ActiveRecord::Calculations module
-"futurized", that means, for `#count` you get `#future_count`, for `#sum` you get `#future_sum` and so on. All future 
+#### Calculation methods
+You also get all the calculation methods provided by the ActiveRecord::Calculations module
+"futurized". More specifically you get:
+* future_count
+* future_average
+* future_minimum
+* future_maximum
+* future_sum
+* future_calculate
+* future_pluck
+
+All future
 calculations are triggered with the `#value` method, except for the `#future_pluck` method, that returns an array, and is
 triggered with a `#to_a` method (or any other method that delegates to it).
+
+#### Finder methods
+
+Lastly, you also get finder methods futurized, which are:
+
+* future_find
+* future_first
+* future_last
+* future_exists?
+* future_all
+
+As with the other future methods, those which return an array get triggered with
+the `to_a` method, or the delegated ones, and those that return a value or a hash
+are triggered with the `value` method. Note that the `find` method returns an
+array or a value depending on the parameters provided, and so will the futurized
+version of the method.
 
 ## Database support
 
@@ -88,7 +115,7 @@ it will execute the future's query whenever the future is triggered, but it will
 
 Multi statement queries are supported by the mysql2 gem since version 0.3.12b1, so you'll need to use that one or a newer
 one.
-Currently the adapter provided inherits the built-in one in Rails, and it also sets the MULTI_STATEMENTS flag to allow 
+Currently the adapter provided inherits the built-in one in Rails, and it also sets the MULTI_STATEMENTS flag to allow
 multiple queries in a single command.
 If you have an older version of the gem, ActiveRecord::Futures will fall back to normal query execution.
 
