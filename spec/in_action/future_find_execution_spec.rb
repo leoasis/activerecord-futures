@@ -18,6 +18,13 @@ describe "future_find method" do
       arel.to_sql
     end
 
+    let(:future_sql_sqlite3) do
+      arel = relation.arel
+      arel.constraints.unshift(Arel.sql('"posts"."id" = ?'))
+      arel.limit = 1
+      arel.to_sql
+    end
+
     before do
       Post.create(published_at: Time.new(2012, 12, 10))
       Post.create(published_at: Time.new(2012, 6, 23))
