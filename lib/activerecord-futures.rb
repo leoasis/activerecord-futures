@@ -14,6 +14,9 @@ require "active_record/futures/calculation_methods"
 require "active_record/futures"
 require "active_record/futures/delegation"
 
+require "active_record/futures/middleware" if defined?(Rack)
+require "active_record/futures/railtie" if defined?(Rails)
+
 module ActiveRecord
   class Relation
     include Futures
