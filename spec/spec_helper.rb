@@ -4,16 +4,16 @@ Coveralls.wear!
 require 'activerecord-futures'
 
 configs = {
+  future_enabled_postgresql: {
+    adapter: "postgresql",
+    database: "activerecord_futures_test",
+    username: "postgres"
+  },
   future_enabled_mysql2: {
-    adapter: "future_enabled_mysql2",
+    adapter: "mysql2",
     database: "activerecord_futures_test",
     username: "root",
     encoding: "utf8"
-  },
-  future_enabled_postgresql: {
-    adapter: "future_enabled_postgresql",
-    database: "activerecord_futures_test",
-    username: "postgres"
   },
   postgresql: {
     adapter: "postgresql",
@@ -25,6 +25,10 @@ configs = {
     database: "activerecord_futures_test",
     username: "root",
     encoding: "utf8"
+  },
+  sqlite3: {
+    adapter: "sqlite3",
+    database: ':memory:'
   }
 }
 
@@ -38,6 +42,8 @@ supports_futures =
   ActiveRecord::Base.connection.respond_to?(:supports_futures?) &&
   ActiveRecord::Base.connection.supports_futures?
 
+puts "Supports futures!" if supports_futures
+
 require 'db/schema'
 Dir['./spec/models/**/*.rb'].each { |f| require f }
 
@@ -50,7 +56,10 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
   config.filter_run_excluding(supports_futures ? :not_supporting_adapter : :supporting_adapter)
-  config.filter_run_excluding(postgresql: config_key.to_s.include?("postgresql") ? false : true)
+
+  %w(postgresql mysql2 sqlite3).each do |adapter|
+    config.filter_run_excluding(adapter.to_sym => !config_key.to_s.include?(adapter))
+  end
   # Run specs in random order to surface order dependencies. If you find an
   # order dependency and want to debug it, you can fix the order by providing
   # the seed, which is printed after each run.

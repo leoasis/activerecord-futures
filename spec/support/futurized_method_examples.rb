@@ -9,12 +9,17 @@ shared_examples "a futurized method" do |exec_trigger|
       calling_future.should exec(1).query
     end
 
-    specify(nil, postgresql: false) do
+    specify(nil, postgresql: false, sqlite3: false) do
       calling_future.should exec_query(future_sql)
     end
 
     specify(nil, postgresql: true) do
       sql = respond_to?(:future_sql_postgresql) ? future_sql_postgresql : future_sql
+      calling_future.should exec_query(sql)
+    end
+
+    specify(nil, sqlite3: true) do
+      sql = respond_to?(:future_sql_sqlite3) ? future_sql_sqlite3 : future_sql
       calling_future.should exec_query(sql)
     end
 

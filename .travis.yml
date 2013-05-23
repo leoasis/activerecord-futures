@@ -2,18 +2,17 @@ language: ruby
 rvm:
   - 1.9.3
 env:
-  - ADAPTER=future_enabled_mysql2 activerecord=3.2.11
-  - ADAPTER=future_enabled_mysql2 activerecord=3.2.12
-  - ADAPTER=future_enabled_mysql2 activerecord=3.2.13
   - ADAPTER=mysql2 activerecord=3.2.11
   - ADAPTER=mysql2 activerecord=3.2.12
   - ADAPTER=mysql2 activerecord=3.2.13
-  - ADAPTER=future_enabled_postgresql activerecord=3.2.11
-  - ADAPTER=future_enabled_postgresql activerecord=3.2.12
-  - ADAPTER=future_enabled_postgresql activerecord=3.2.13
+  - ADAPTER=future_enabled_mysql2 activerecord=3.2.13
   - ADAPTER=postgresql activerecord=3.2.11
   - ADAPTER=postgresql activerecord=3.2.12
   - ADAPTER=postgresql activerecord=3.2.13
+  - ADAPTER=future_enabled_postgresql activerecord=3.2.13
+  - ADAPTER=sqlite3 activerecord=3.2.11
+  - ADAPTER=sqlite3 activerecord=3.2.12
+  - ADAPTER=sqlite3 activerecord=3.2.13
 
 before_script:
   - mysql -e 'create database activerecord_futures_test;'

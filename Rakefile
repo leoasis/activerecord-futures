@@ -5,7 +5,7 @@ RSpec::Core::RakeTask.new(:spec)
 
 task :default => :spec
 
-ADAPTERS = %w(future_enabled_mysql2 future_enabled_postgresql postgresql mysql2)
+ADAPTERS = %w(future_enabled_postgresql future_enabled_mysql2 postgresql mysql2 sqlite3)
 
 desc "Runs the specs with all databases"
 task :all do
