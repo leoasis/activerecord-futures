@@ -33,16 +33,9 @@ Or install it yourself as:
 
 ## Usage
 
-Once the gem is installed, set your config/database.yml file to use a future enabled adapter:
+If you're using postgresql or mysql2 currently, you have nothing more to do. The gem will automatically use the future enabled adapter and just work. If you are using a custom adapter, specify it in the config/database.yml file as you're used to.
 
-```yml
-development: &development
-  adapter: future_enabled_mysql2 # or "future_enabled_postgresql"
-  username: your_username
-  password: your_password
-  database: your_database
-  host: your_host
-```
+Check the database support (below) section for more info.
 
 Now let's see what this does, consider a model `User`, with a `:name` attribute:
 
@@ -65,6 +58,20 @@ Any amount of futures can be prepared, and they will get executed as soon as one
 
 This makes this especially useful for pagination queries, since you can execute
 both count and page queries at once.
+
+#### Rails
+
+No configuration to do, things will Just Work.
+
+#### Rack based apps (not Rails)
+
+You will need to manually add the `ActiveRecord::Futures::Middleware` somewhere in the middleware stack:
+
+```ruby
+use ActiveRecord::Futures::Middleware
+```
+
+This is to clear the futures that were defined and not triggered between requests.
 
 ### Methods
 
@@ -99,8 +106,8 @@ Lastly, you also get finder methods futurized, which are:
 * future_all
 
 As with the other future methods, those which return an array get triggered with
-the `to_a` method, or the delegated ones, and those that return a value or a hash
-are triggered with the `value` method. Note that the `find` method returns an
+the `#to_a` method, or the delegated ones, and those that return a value or a hash
+are triggered with the `#value` method. Note that the `#find` method returns an
 array or a value depending on the parameters provided, and so will the futurized
 version of the method.
 
@@ -121,8 +128,8 @@ If you have an older version of the gem, ActiveRecord::Futures will fall back to
 
 ### Postgres
 
-The pg gem supports multiple statement queries by using the `send_query` method
-and retrieving the results via `get_result`.
+The pg gem supports multiple statement queries by using the `#send_query` method
+and retrieving the results via `#get_result`.
 
 ### Other databases
 
